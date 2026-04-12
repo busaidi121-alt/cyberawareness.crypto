@@ -56,7 +56,7 @@ body::after{
 
 /* ── HEADER ── */
 .hdr{text-align:center;padding:2.5rem 0 2rem;position:relative;}
-.hdr::before,.hdr::after{
+.hdr::before,/*.hdr::after*/{
   content:'✦ ✦ ✦';font-size:14px;color:var(--gold);
   letter-spacing:8px;display:block;margin-bottom:.75rem;
   animation:shimmer 3s ease-in-out infinite;
@@ -289,7 +289,7 @@ footer{text-align:center;padding-top:3rem;font-family:var(--display);font-size:1
 <header class="hdr">
   <div class="hdr-sub">Cybersecurity Awareness</div>
   <h1>The <span>Cipher</span> Vault</h1>
-  <p>Prove your cryptographic skill — choose your challenge and unlock the vault.</p>
+  <p>Prove your cryptographic skill and unlock the vault.</p>
 </header>
 
   <!-- 
@@ -334,21 +334,21 @@ footer{text-align:center;padding-top:3rem;font-family:var(--display);font-size:1
       <span class="mc-icon">🔐</span>
       <div class="mc-title">Encrypt</div>
       <div class="mc-sub">Turn plain messages into secret code using a cipher key.</div>
-      <div class="mc-levels">
+     <!-- <div class="mc-levels">
         <span class="lvl-pill lv-e">Caesar — Easy</span>
         <span class="lvl-pill lv-m">Substitution — Medium</span>
         <span class="lvl-pill lv-h">Vigenère — Hard</span>
-      </div>
+      </div> -->
     </div>
     <div class="mode-card" onclick="startMode('decrypt')">
       <span class="mc-icon">🔓</span>
       <div class="mc-title">Decrypt</div>
       <div class="mc-sub">Crack coded messages and reveal the hidden plaintext.</div>
-      <div class="mc-levels">
+     <!-- <div class="mc-levels">
         <span class="lvl-pill lv-e">Caesar — Easy</span>
         <span class="lvl-pill lv-m">Substitution — Medium</span>
         <span class="lvl-pill lv-h">Vigenère — Hard</span>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>
@@ -363,7 +363,7 @@ footer{text-align:center;padding-top:3rem;font-family:var(--display);font-size:1
   <p class="wsub">You have mastered all three cipher challenges.<br/>Your reward awaits.</p>
   <div class="cert-panel">
     <p><strong>Congratulations, Cipher Master!</strong><br/><br/>
-    You have successfully completed all three challenges. Please <strong>approach the instructor at the booth</strong> to collect your <strong>physical certificate of achievement</strong>.<br/><br/>Show this screen as proof! 🎓</p>
+    You have successfully completed all three challenges. Please <strong>approach the instructor at the booth</strong> to collect your <strong> certificate of achievement</strong>.<br/><br/>Show this screen as proof! </p>
   </div>
   <div class="nrow"><input type="text" id="nin" placeholder="Enter your name for the certificate…"/></div>
   <button class="bname" onclick="showName()">Display name for instructor</button>
