@@ -399,7 +399,7 @@ const CHALLENGES={
      hint:'K→P, N→M, O→L, W→D, L→O, E→V, D→W, G→T, E→V, I→R, S→H, K→P, E→V, Y→B'},
     {id:2,cipher:'vigenere',diff:'hard',
      title:'Challenge 3 — Vigenère Cipher',
-     desc:'Encrypt the plaintext using the keyword ACE. For each letter, shift it forward by the value of the corresponding keyword letter (A=0, C=2, E=4). The keyword repeats.',
+     desc:'The Vigenère cipher uses a repeating keyword to shift each letter differently. Subtract the shift of each keyword letter to decrypt. The table below shows every shift.',
      pt:'GUTECH',ans:'GWXEEL',vkey:'ACE',
      hint:'A=0 steps, C=2 steps, E=4 steps. G+A(0)=G, U+C(2)=W, T+E(4)=X, E+A(0)=E, C+C(2)=E, H+E(4)=L.'}
   ],
@@ -550,13 +550,10 @@ function mkCard(ch,fu){
         <div class="lbl">Keyword</div>
         <div class="kpill">${ch.vkey}</div>
         <div class="lbl">How to encrypt — step by step</div>
-        <div style="background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.15);border-radius:10px;padding:14px 16px;margin-bottom:1.25rem;font-size:15px;line-height:2;">
-          <p style="margin-bottom:10px;color:var(--ink2);">The keyword <strong style="color:var(--ink);font-family:var(--mono);">${ch.vkey}</strong> repeats over your word. Each keyword letter tells you how many steps forward to shift the plaintext letter:</p>
-          <div style="font-family:var(--mono);font-size:13px;">
-            <div style="margin-bottom:4px;"><span style="color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;">A = 0 steps  &nbsp;</span> (no shift — letter stays the same)</div>
-            <div style="margin-bottom:4px;"><span style="color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;">C = 2 steps  &nbsp;</span> </div>
-            <div style="margin-bottom:12px;"><span style="color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;">E = 4 steps  &nbsp;</span></div>
-          </div>
+         <div style="background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.15);border-radius:10px;padding:14px 16px;margin-bottom:1.25rem;font-size:15px;line-height:1.9;">
+          <p style="color:var(--ink2);margin-bottom:6px;">1. The keyword <span style="font-family:var(--mono);color:var(--ink);font-weight:600;">${ch.vkey}</span> repeats over the secret message, one letter at a time.</p>
+          <p style="color:var(--ink2);margin-bottom:6px;">2. Each keyword letter tells you how many steps <strong style="color:var(--ink);">backward</strong> to shift the coded letter in the alphabet.</p>
+          <p style="color:var(--ink2);margin-bottom:14px;">3. <span style="font-family:var(--mono);color:var(--gold2);">A = 0 steps</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">C = 2 steps forward</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">E = 4 steps forward</span></p>
           <div class="vtable">
             <table>
               <tr><td class="vt-h">Letter</td>${clean.split('').map((_,i)=>`<td class="vt-h">${i+1}</td>`).join('')}</tr>
@@ -576,8 +573,8 @@ function mkCard(ch,fu){
         <div class="cbox">${ch.ct}</div>
         <div class="lbl">Keyword</div>
         <div class="kpill">${ch.vkey}</div>
+        <div class="lbl">How to decrypt — step by step</div>
         <div style="background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.15);border-radius:10px;padding:14px 16px;margin-bottom:1.25rem;font-size:15px;line-height:1.9;">
-          <p style="color:var(--ink);font-weight:600;margin-bottom:8px;">How to decode — 3 simple steps:</p>
           <p style="color:var(--ink2);margin-bottom:6px;">① The keyword <span style="font-family:var(--mono);color:var(--ink);font-weight:600;">${ch.vkey}</span> repeats over the secret message, one letter at a time.</p>
           <p style="color:var(--ink2);margin-bottom:6px;">② Each keyword letter tells you how many steps <strong style="color:var(--ink);">backward</strong> to shift the coded letter in the alphabet.</p>
           <p style="color:var(--ink2);margin-bottom:14px;">③ <span style="font-family:var(--mono);color:var(--gold2);">A = 0 steps</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">C = 2 steps back</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">E = 4 steps back</span></p>
