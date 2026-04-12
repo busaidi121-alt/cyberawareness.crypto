@@ -552,8 +552,8 @@ function mkCard(ch,fu){
         <div class="lbl">How to encrypt — step by step</div>
          <div style="background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.15);border-radius:10px;padding:14px 16px;margin-bottom:1.25rem;font-size:15px;line-height:1.9;">
           <p style="color:var(--ink2);margin-bottom:6px;">1. The keyword <span style="font-family:var(--mono);color:var(--ink);font-weight:600;">${ch.vkey}</span> repeats over the secret message, one letter at a time.</p>
-          <p style="color:var(--ink2);margin-bottom:6px;">2. Each keyword letter tells you how many steps <strong style="color:var(--ink);">backward</strong> to shift the coded letter in the alphabet.</p>
-          <p style="color:var(--ink2);margin-bottom:14px;">3. <span style="font-family:var(--mono);color:var(--gold2);">A = 0 steps</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">C = 2 steps forward</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">E = 4 steps forward</span></p>
+          <p style="color:var(--ink2);margin-bottom:6px;">2. Each keyword letter tells you how many steps <strong style="color:var(--ink);">forward</strong> to shift the coded letter in the alphabet.</p>
+          <p style="color:var(--ink2);margin-bottom:14px;">3. <span style="font-family:var(--mono);color:var(--gold2);"> A = 0 steps</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">C = 2 steps forward</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">E = 4 steps forward</span></p>
           <div class="vtable">
             <table>
               <tr><td class="vt-h">Letter</td>${clean.split('').map((_,i)=>`<td class="vt-h">${i+1}</td>`).join('')}</tr>
