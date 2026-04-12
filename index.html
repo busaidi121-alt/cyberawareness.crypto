@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cryptography Challenge Booth</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f6eac4;
+  --bg2:#f0dfa8;
+  --bg3:#e8d08a;
+  --parch:#fdf6e3;
+  --ink:#800020;
+  --ink2:#5a0016;
+  --ink3:#3d000f;
+  --gold:#c8860a;
+  --gold2:#e6a020;
+  --gold3:#f5c842;
+  --rust:#a0340a;
+  --rose:#d4556a;
+  --sage:#4a6741;
+  --cream:#fffaf0;
+  --shadow:rgba(128,0,32,.18);
+  --mono:'Courier New',monospace;
+  --serif:'Crimson Pro',Georgia,serif;
+  --display:'Cinzel',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--serif);font-size:17px;min-height:100vh;overflow-x:hidden;
+}
+
+/* parchment texture overlay */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.6;
+}
+
+/* wax seal decorative corners */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 0% 0%,rgba(200,134,10,.08) 0%,transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 100%,rgba(128,0,32,.08) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+.page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+
+/* ── HEADER ── */
+.hdr{text-align:center;padding:2.5rem 0 2rem;position:relative;}
+.hdr::before,.hdr::after{
+  content:'✦ ✦ ✦';font-size:14px;color:var(--gold);
+  letter-spacing:8px;display:block;margin-bottom:.75rem;
+  animation:shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer{0%,100%{opacity:.6;}50%{opacity:1;}}
+.hdr-sub{font-family:var(--display);font-size:12px;color:var(--gold);letter-spacing:5px;text-transform:uppercase;margin-bottom:.75rem;}
+.hdr h1{font-family:var(--display);font-size:clamp(2.4rem,7vw,4.5rem);font-weight:700;color:var(--ink);line-height:1;margin-bottom:.75rem;text-shadow:2px 2px 0 rgba(128,0,32,.12);}
+.hdr h1 span{color:var(--gold);}
+.hdr p{font-size:18px;color:var(--ink2);max-width:500px;margin:0 auto;line-height:1.7;font-style:italic;}
+.divider{
+  display:flex;align-items:center;gap:1rem;margin:1.5rem 0;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.divider span{font-family:var(--display);font-size:11px;letter-spacing:3px;color:var(--gold);white-space:nowrap;}
+
+/* ── QR SECTION ── */
+.qr-wrap{
+  background:var(--parch);border:2px solid var(--gold);border-radius:12px;
+  padding:1.25rem 1.5rem;margin-bottom:1.75rem;
+  display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;
+  box-shadow:4px 4px 0 rgba(128,0,32,.1),inset 0 0 0 1px rgba(200,134,10,.15);
+}
+.qr-frame{
+  width:110px;height:110px;background:#fff;border-radius:6px;flex-shrink:0;
+  border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.qr-frame img{width:100%;height:100%;object-fit:contain;}
+.qr-info h3{font-family:var(--display);font-size:16px;font-weight:600;margin-bottom:5px;color:var(--ink);}
+.qr-info p{font-size:15px;color:var(--ink2);line-height:1.6;}
+.qr-url{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--gold);background:rgba(200,134,10,.08);border:1px solid var(--gold);border-radius:5px;padding:4px 10px;}
+
+/* ── PROGRESS ── */
+.prog-row{display:flex;gap:8px;margin-bottom:1.75rem;}
+.pg{
+  flex:1;background:var(--parch);border:2px solid rgba(128,0,32,.2);
+  border-radius:10px;padding:11px 8px;text-align:center;transition:all .3s;
+}
+.pg.active{border-color:var(--ink);background:rgba(128,0,32,.06);}
+.pg.done{border-color:var(--sage);background:rgba(74,103,65,.06);}
+.pg-n{font-family:var(--display);font-size:22px;color:rgba(128,0,32,.3);}
+.pg.active .pg-n{color:var(--ink);}
+.pg.done .pg-n{color:var(--sage);}
+.pg-lbl{font-size:11px;color:rgba(128,0,32,.5);text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-family:var(--display);}
+
+/* ── MODE SELECTOR ── */
+#mode-screen{animation:fadeIn .5s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.mode-intro{text-align:center;margin-bottom:2rem;}
+.mode-intro p{font-size:18px;color:var(--ink2);line-height:1.7;max-width:480px;margin:0 auto;}
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:500px){.mode-cards{grid-template-columns:1fr;}}
+.mode-card{
+  background:var(--parch);border:2px solid rgba(128,0,32,.25);border-radius:14px;
+  padding:2rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s;
+  box-shadow:3px 3px 0 rgba(128,0,32,.08);
+  position:relative;overflow:hidden;
+}
+.mode-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,134,10,.06) 0%,transparent 60%);
+  opacity:0;transition:opacity .25s;
+}
+.mode-card:hover{border-color:var(--ink);transform:translateY(-3px);box-shadow:5px 6px 0 rgba(128,0,32,.15);}
+.mode-card:hover::before{opacity:1;}
+.mode-card:active{transform:translateY(0);}
+.mc-icon{font-size:52px;margin-bottom:.75rem;display:block;filter:drop-shadow(2px 2px 3px rgba(128,0,32,.2));}
+.mc-title{font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.mc-sub{font-size:15px;color:var(--ink2);line-height:1.6;font-style:italic;}
+.mc-levels{display:flex;gap:6px;justify-content:center;margin-top:1rem;flex-wrap:wrap;}
+.lvl-pill{font-size:12px;font-family:var(--display);padding:3px 10px;border-radius:20px;border:1px solid;}
+.lv-e{color:var(--sage);border-color:rgba(74,103,65,.4);background:rgba(74,103,65,.08);}
+.lv-m{color:var(--gold);border-color:rgba(200,134,10,.4);background:rgba(200,134,10,.08);}
+.lv-h{color:var(--rust);border-color:rgba(160,52,10,.4);background:rgba(160,52,10,.08);}
+
+/* ── CHALLENGE AREA ── */
+#challenge-area{animation:fadeIn .5s ease;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--display);font-size:13px;letter-spacing:1px;
+  color:var(--gold);border:1px solid var(--gold);
+  background:rgba(200,134,10,.06);border-radius:8px;
+  padding:7px 16px;cursor:pointer;transition:all .2s;margin-bottom:1.5rem;
+  text-transform:uppercase;
+}
+.back-btn:hover{background:rgba(200,134,10,.15);}
+.mode-title-bar{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
+.mode-tag{
+  font-family:var(--display);font-size:13px;letter-spacing:2px;text-transform:uppercase;
+  padding:5px 16px;border-radius:8px;border:2px solid;
+}
+.tag-enc{color:var(--rust);border-color:var(--rust);background:rgba(160,52,10,.06);}
+.tag-dec{color:var(--ink);border-color:var(--ink);background:rgba(128,0,32,.06);}
+.mode-title{font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink);}
+
+/* ── CARDS ── */
+.card{
+  background:var(--parch);border:2px solid rgba(128,0,32,.2);border-radius:14px;
+  padding:1.75rem;margin-bottom:1.25rem;transition:border-color .3s;
+  box-shadow:3px 3px 0 rgba(128,0,32,.07);
+  position:relative;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:14px 14px 0 0;background:transparent;transition:background .3s;
+}
+.card.active-c{border-color:var(--ink);}
+.card.active-c::before{background:linear-gradient(90deg,var(--ink),var(--rose),var(--gold));}
+.card.done-c{border-color:var(--sage);}
+.card.done-c::before{background:var(--sage);}
+.ch-head{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.badge{font-family:var(--display);font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid;letter-spacing:1px;text-transform:uppercase;}
+.b-num{color:var(--ink2);border-color:rgba(128,0,32,.3);background:rgba(128,0,32,.06);}
+.b-caesar{color:var(--ink);border-color:rgba(128,0,32,.4);background:rgba(128,0,32,.06);}
+.b-sub{color:var(--rust);border-color:rgba(160,52,10,.4);background:rgba(160,52,10,.06);}
+.b-vig{color:var(--gold);border-color:rgba(200,134,10,.4);background:rgba(200,134,10,.06);}
+.b-easy{color:var(--sage);border-color:rgba(74,103,65,.4);background:rgba(74,103,65,.06);}
+.b-medium{color:var(--gold);border-color:rgba(200,134,10,.4);background:rgba(200,134,10,.06);}
+.b-hard{color:var(--rust);border-color:rgba(160,52,10,.4);background:rgba(160,52,10,.06);}
+.b-done{margin-left:auto;color:var(--sage);border-color:rgba(74,103,65,.4);background:rgba(74,103,65,.06);}
+.card h3{font-family:var(--display);font-size:19px;font-weight:600;margin-bottom:.4rem;color:var(--ink);}
+.card .desc{font-size:16px;color:var(--ink2);line-height:1.7;margin-bottom:1.25rem;font-style:italic;}
+.lbl{font-family:var(--display);font-size:10px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:7px;}
+.cbox{
+  font-family:var(--mono);font-size:20px;letter-spacing:3px;
+  color:var(--ink);background:rgba(128,0,32,.05);border:1px solid rgba(128,0,32,.2);
+  border-radius:8px;padding:14px 18px;margin-bottom:1.25rem;word-break:break-all;line-height:1.7;
+}
+.cbox.em{color:var(--rust);border-color:rgba(160,52,10,.3);background:rgba(160,52,10,.05);}
+.kpill{
+  display:inline-block;font-family:var(--mono);font-size:15px;
+  color:var(--gold2);background:rgba(200,134,10,.08);border:1px solid rgba(200,134,10,.3);
+  border-radius:8px;padding:6px 14px;margin-bottom:1.25rem;letter-spacing:2px;
+}
+
+/* slider */
+.slrow{display:flex;align-items:center;gap:14px;margin-bottom:1rem;}
+.slrow label{font-family:var(--display);font-size:12px;color:var(--gold);white-space:nowrap;letter-spacing:1px;text-transform:uppercase;}
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:rgba(128,0,32,.2);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--ink);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 2px var(--ink);}
+.sval{font-family:var(--display);font-size:22px;color:var(--ink);font-weight:700;min-width:28px;text-align:center;}
+
+/* sub grid */
+.sgrid{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:4px;margin-bottom:1.25rem;}
+.sc{text-align:center;}
+.sco{font-family:var(--mono);font-size:10px;color:var(--gold);margin-bottom:3px;}
+.sc input{width:100%;text-align:center;padding:5px 1px;font-family:var(--mono);font-size:13px;text-transform:uppercase;background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.2);color:var(--ink);border-radius:4px;outline:none;}
+.sc input:focus{border-color:var(--ink);background:rgba(128,0,32,.08);}
+
+/* prev */
+.prev{
+  font-family:var(--mono);font-size:16px;letter-spacing:2px;
+  color:rgba(128,0,32,.4);background:rgba(128,0,32,.04);border:1px dashed rgba(128,0,32,.25);
+  border-radius:8px;padding:13px 18px;margin-bottom:1.25rem;min-height:50px;
+  word-break:break-all;line-height:1.7;transition:all .2s;
+}
+
+/* vigenere table */
+.vtable{overflow-x:auto;margin-bottom:1.25rem;}
+.vtable table{border-collapse:collapse;font-family:var(--mono);font-size:12px;white-space:nowrap;}
+.vtable td{padding:4px 7px;border:1px solid rgba(128,0,32,.15);}
+.vt-h{color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;}
+.vt-c{color:var(--ink);}
+.vt-k{color:var(--rust);}
+.vt-s{color:rgba(128,0,32,.5);}
+
+/* answer */
+.arow{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.arow input[type=text]{
+  flex:1;min-width:180px;background:rgba(128,0,32,.04);border:2px solid rgba(128,0,32,.25);
+  color:var(--ink);border-radius:10px;padding:12px 16px;
+  font-family:var(--mono);font-size:15px;letter-spacing:1.5px;outline:none;
+}
+.arow input[type=text]:focus{border-color:var(--ink);}
+.bsub{
+  padding:12px 22px;border-radius:10px;border:2px solid var(--ink);
+  background:var(--ink);color:var(--bg);font-family:var(--display);
+  font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:1px;text-transform:uppercase;
+}
+.bsub:hover{background:var(--ink2);border-color:var(--ink2);}
+.bsub:active{transform:scale(.97);}
+.bhint{
+  padding:10px 18px;border-radius:10px;border:2px solid rgba(200,134,10,.4);
+  background:transparent;color:var(--gold);font-family:var(--display);
+  font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:1px;text-transform:uppercase;
+}
+.bhint:hover{background:rgba(200,134,10,.1);}
+.fb{padding:12px 16px;border-radius:10px;font-family:var(--serif);font-size:15px;margin-top:8px;display:none;line-height:1.6;}
+.fbok{background:rgba(74,103,65,.08);border:2px solid rgba(74,103,65,.3);color:var(--sage);display:block;}
+.fberr{background:rgba(160,52,10,.08);border:2px solid rgba(160,52,10,.3);color:var(--rust);display:block;}
+.hbox{padding:12px 16px;border-radius:10px;font-size:15px;margin-top:8px;display:none;background:rgba(200,134,10,.06);border-left:4px solid var(--gold);color:var(--ink2);line-height:1.7;font-style:italic;}
+.locked{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(128,0,32,.05);border-radius:8px;color:rgba(128,0,32,.5);font-size:15px;border:1px dashed rgba(128,0,32,.2);}
+
+/* ── WIN SCREEN ── */
+#win{display:none;text-align:center;background:var(--parch);border:3px solid var(--gold);border-radius:20px;padding:3rem 2rem;margin-top:1.5rem;box-shadow:6px 6px 0 rgba(128,0,32,.12);}
+#win.show{display:block;animation:fadeIn .7s ease;}
+.seal{font-size:72px;animation:seal-pop .6s cubic-bezier(.17,.67,.24,1.4);display:block;margin-bottom:1rem;}
+@keyframes seal-pop{from{transform:scale(0) rotate(-20deg);}to{transform:scale(1) rotate(0);}}
+#win h2{font-family:var(--display);font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+#win .wsub{font-size:18px;color:var(--ink2);line-height:1.7;margin-bottom:1.5rem;font-style:italic;}
+.cert-panel{
+  background:rgba(128,0,32,.05);border:2px solid rgba(128,0,32,.2);
+  border-radius:14px;padding:1.5rem;max-width:520px;margin:0 auto 1.5rem;
+}
+.cert-panel p{font-size:17px;line-height:1.8;color:var(--ink2);}
+.cert-panel strong{color:var(--ink);}
+.nrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
+.nrow input{background:rgba(128,0,32,.04);border:2px solid rgba(128,0,32,.25);color:var(--ink);border-radius:10px;padding:12px 20px;font-family:var(--serif);font-size:17px;outline:none;text-align:center;min-width:280px;}
+.nrow input:focus{border-color:var(--ink);}
+.bname{padding:13px 30px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font-family:var(--display);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px;text-transform:uppercase;}
+.bname:hover{background:var(--ink2);}
+#nout{font-family:var(--display);font-size:24px;color:var(--ink);letter-spacing:3px;margin-top:1rem;display:none;}
+
+/* ── PLAY AGAIN ── */
+.play-again{margin-top:1.5rem;text-align:center;}
+.bpa{padding:11px 26px;border-radius:10px;border:2px solid var(--gold);background:rgba(200,134,10,.08);color:var(--gold);font-family:var(--display);font-size:14px;cursor:pointer;transition:all .2s;letter-spacing:1px;text-transform:uppercase;}
+.bpa:hover{background:rgba(200,134,10,.2);}
+
+/* ── PARTICLES ── */
+.pt{position:fixed;pointer-events:none;animation:ptfall linear forwards;z-index:999;}
+@keyframes ptfall{0%{opacity:1;transform:translateY(-10px) rotate(0) scale(1);}100%{opacity:0;transform:translateY(105vh) rotate(540deg) scale(.4);}}
+
+footer{text-align:center;padding-top:3rem;font-family:var(--display);font-size:11px;color:rgba(128,0,32,.4);letter-spacing:3px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-sub">Cybersecurity Awareness</div>
+  <h1>The <span>Cipher</span> Vault</h1>
+  <p>Prove your cryptographic skill — choose your challenge and unlock the vault.</p>
+</header>
+
+<div class="divider"><span>✦ Scan to Play ✦</span></div>
+
+<!-- QR -->
+<div class="qr-wrap">
+  <div class="qr-frame">
+    <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="6" width="30" height="30" rx="3" fill="none" stroke="#800020" stroke-width="3"/>
+      <rect x="13" y="13" width="16" height="16" fill="#800020"/>
+      <rect x="54" y="6" width="30" height="30" rx="3" fill="none" stroke="#800020" stroke-width="3"/>
+      <rect x="61" y="13" width="16" height="16" fill="#800020"/>
+      <rect x="6" y="54" width="30" height="30" rx="3" fill="none" stroke="#800020" stroke-width="3"/>
+      <rect x="13" y="61" width="16" height="16" fill="#800020"/>
+      <rect x="54" y="54" width="6" height="6" fill="#800020"/><rect x="64" y="54" width="6" height="6" fill="#800020"/><rect x="74" y="54" width="6" height="6" fill="#800020"/>
+      <rect x="54" y="64" width="6" height="6" fill="#800020"/><rect x="74" y="64" width="6" height="6" fill="#800020"/>
+      <rect x="54" y="74" width="6" height="6" fill="#800020"/><rect x="64" y="74" width="16" height="6" fill="#800020"/>
+      <rect x="40" y="6" width="6" height="6" fill="#800020"/><rect x="40" y="16" width="6" height="6" fill="#800020"/><rect x="40" y="26" width="6" height="6" fill="#800020"/>
+      <rect x="6" y="40" width="6" height="6" fill="#800020"/><rect x="16" y="40" width="6" height="6" fill="#800020"/><rect x="26" y="40" width="16" height="6" fill="#800020"/>
+      <rect x="40" y="40" width="6" height="6" fill="#800020"/><rect x="50" y="40" width="6" height="6" fill="#800020"/>
+    </svg>
+  </div>
+  <div class="qr-info">
+    <h3>Scan to open on your phone</h3>
+    <p>Play on any device — no app needed.<br/>Host the file, then replace this QR with your real one.</p>
+    <span class="qr-url">← paste your hosted URL here</span>
+  </div>
+</div>
+
+<div class="divider"><span>✦ Choose Your Path ✦</span></div>
+
+<!-- MODE SCREEN -->
+<div id="mode-screen">
+  <div class="mode-intro">
+    <p>Select whether you want to <strong>encrypt</strong> plaintext into secret code, or <strong>decrypt</strong> ciphertext back into readable messages.</p>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="startMode('encrypt')">
+      <span class="mc-icon">🔐</span>
+      <div class="mc-title">Encrypt</div>
+      <div class="mc-sub">Turn plain messages into secret code using a cipher key.</div>
+      <div class="mc-levels">
+        <span class="lvl-pill lv-e">Caesar — Easy</span>
+        <span class="lvl-pill lv-m">Substitution — Medium</span>
+        <span class="lvl-pill lv-h">Vigenère — Hard</span>
+      </div>
+    </div>
+    <div class="mode-card" onclick="startMode('decrypt')">
+      <span class="mc-icon">🔓</span>
+      <div class="mc-title">Decrypt</div>
+      <div class="mc-sub">Crack coded messages and reveal the hidden plaintext.</div>
+      <div class="mc-levels">
+        <span class="lvl-pill lv-e">Caesar — Easy</span>
+        <span class="lvl-pill lv-m">Substitution — Medium</span>
+        <span class="lvl-pill lv-h">Vigenère — Hard</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHALLENGE AREA (hidden until mode chosen) -->
+<div id="challenge-area" style="display:none;"></div>
+
+<!-- WIN -->
+<div id="win">
+  <span class="seal">🏆</span>
+  <h2>Vault Unlocked!</h2>
+  <p class="wsub">You have mastered all three cipher challenges.<br/>Your reward awaits.</p>
+  <div class="cert-panel">
+    <p><strong>Congratulations, Cipher Master!</strong><br/><br/>
+    You have successfully completed all three challenges. Please <strong>approach the instructor at the booth</strong> to collect your <strong>physical certificate of achievement</strong>.<br/><br/>Show this screen as proof! 🎓</p>
+  </div>
+  <div class="nrow"><input type="text" id="nin" placeholder="Enter your name for the certificate…"/></div>
+  <button class="bname" onclick="showName()">Display name for instructor</button>
+  <div id="nout"></div>
+  <div class="play-again">
+    <button class="bpa" onclick="reset()">← Try the other mode</button>
+  </div>
+</div>
+
+<footer>The Cipher Vault &nbsp;·&nbsp; Cybersecurity Awareness Day 2026</footer>
+</div>
+
+<script>
+const AL='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function cEnc(t,s){return t.toUpperCase().split('').map(c=>{const i=AL.indexOf(c);return i<0?c:AL[(i+s)%26];}).join('');}
+function cDec(t,s){return cEnc(t,(26-s%26+26)%26);}
+function sEnc(t,k){return t.toUpperCase().split('').map(c=>{const i=AL.indexOf(c);return i<0?c:k[i];}).join('');}
+function sDec(t,k){return t.toUpperCase().split('').map(c=>{const i=k.indexOf(c);return i<0?c:AL[i];}).join('');}
+function vEnc(t,k){let j=0;return t.toUpperCase().split('').map(c=>{if(!AL.includes(c))return c;const s=AL.indexOf(k[j%k.length].toUpperCase());j++;return AL[(AL.indexOf(c)+s)%26];}).join('');}
+function vDec(t,k){let j=0;return t.toUpperCase().split('').map(c=>{if(!AL.includes(c))return c;const s=AL.indexOf(k[j%k.length].toUpperCase());j++;return AL[(AL.indexOf(c)-s+26)%26];}).join('');}
+
+const CHALLENGES={
+  encrypt:[
+    {id:0,cipher:'caesar',diff:'easy',
+     title:'Challenge 1 — Caesar Cipher',
+     desc:'Apply a Caesar shift of 7 to every letter of the plaintext below. Shift each letter 7 places forward in the alphabet — Z wraps back to A.',
+     pt:'HELLO',ans:'OLSSV',shift:7,
+     hint:'C(2)+7=J, I(8)+7=P, P(15)+7=W, H(7)+7=O, E(4)+7=L, R(17)+7=Y… spaces stay as spaces.'},
+    {id:1,cipher:'substitution',diff:'medium',
+     title:'Challenge 2 — Substitution Cipher',
+     desc:'Use the Atbash key (reversed alphabet) to encrypt the plaintext. Look up each letter in the table and replace it with its pair.',
+     pt:'CRYPTOGRAPHY',ans:'XIBKGLTIZKSB',key:'ZYXWVUTSRQPONMLKJIHGFEDCBA',
+     hint:'K→P, N→M, O→L, W→D, L→O, E→V, D→W, G→T, E→V, I→R, S→H, K→P, E→V, Y→B'},
+    {id:2,cipher:'vigenere',diff:'hard',
+     title:'Challenge 3 — Vigenère Cipher',
+     desc:'Encrypt the plaintext using the keyword KEY. For each letter, shift it forward by the value of the corresponding keyword letter (K=10, E=4, Y=24). The keyword repeats.',
+     pt:'GUTECH',ans:'GWXEEL',vkey:'ACE',
+     hint:'A=0 steps, C=2 steps, E=4 steps. G+A(0)=G, U+C(2)=W, T+E(4)=X, E+A(0)=E, C+C(2)=E, H+E(4)=L.'}
+  ],
+  decrypt:[
+    {id:0,cipher:'caesar',diff:'easy',
+     title:'Challenge 1 — Caesar Cipher',
+     desc:'The message below has been encrypted with a Caesar shift. Use the slider to try different shifts until the hidden message is revealed.',
+     ct:'FUBSWRJUDSKB LV IXQ',ans:'CRYPTOGRAPHY IS FUN',shift:3,
+     hint:'Caesar himself famously used shift 3. Try sliding to 3 and read the preview.'},
+    {id:1,cipher:'substitution',diff:'medium',
+     title:'Challenge 2 — Substitution Cipher',
+     desc:'Every letter has been swapped using a secret alphabet key. Use the grid to map each cipher letter to what you think the original letter is, then type the message.',
+     ct:'ITSSG PGKSR',ans:'HELLO WORLD',key:'QWERTYUIOPASDFGHJKLZXCVBNM',
+     hint:'The key is a QWERTY keyboard layout! A→Q, B→W, C→E… so reverse it: I maps to H, T maps to E, S maps to L…'},
+    {id:2,cipher:'vigenere',diff:'hard',
+     title:'Challenge 3 — Vigenère Cipher',
+     desc:'The Vigenère cipher uses a repeating keyword to shift each letter differently. Subtract the shift of each keyword letter to decrypt. The table below shows every shift.',
+     ct:'CAFETWEEYRKXY',ans:'CYBERSECURITY',vkey:'ACE',
+     hint:'A=0 steps, C=2 steps, E=4 steps. C-A(0)=C, A-C(2)=Y, F-E(4)=B, E-A(0)=E, T-C(2)=R, W-E(4)=S…'}
+  ]
+};
+
+let mode=null,solved=new Set(),solverMaps={};
+
+function startMode(m){
+  mode=m; solved=new Set(); solverMaps={};
+  document.getElementById('mode-screen').style.display='none';
+  document.getElementById('win').classList.remove('show');
+  document.getElementById('nin').value='';
+  document.getElementById('nout').style.display='none';
+  const area=document.getElementById('challenge-area');
+  area.style.display='block';
+  renderChallenges();
+}
+
+function renderChallenges(){
+  const area=document.getElementById('challenge-area');
+  const chs=CHALLENGES[mode];
+  const fu=chs.findIndex(c=>!solved.has(c.id));
+
+  area.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1.5rem;">
+      <button class="back-btn" onclick="reset()">← Back to Mode Select</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        ${chs.map(ch=>`<div class="pg ${solved.has(ch.id)?'done':ch.id===fu?'active':''}">
+          <div class="pg-n">${solved.has(ch.id)?'✓':(ch.id+1)}</div>
+          <div class="pg-lbl">${ch.cipher==='caesar'?'Caesar':ch.cipher==='substitution'?'Sub':'Vig'}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="mode-title-bar">
+      <span class="mode-tag ${mode==='encrypt'?'tag-enc':'tag-dec'}">${mode==='encrypt'?'🔐 Encrypt':'🔓 Decrypt'}</span>
+      <span class="mode-title">Three challenges — Easy to Hard</span>
+    </div>
+    ${chs.map(ch=>mkCard(ch,fu).outerHTML).join('')}
+  `;
+
+  if(solved.size===3){
+    document.getElementById('win').classList.add('show');
+    setTimeout(()=>document.getElementById('win').scrollIntoView({behavior:'smooth',block:'start'}),100);
+    particles();
+  }
+}
+
+function isUnlocked(id){return id===0||solved.has(id-1);}
+
+function mkCard(ch,fu){
+  const un=isUnlocked(ch.id),dn=solved.has(ch.id),ia=ch.id===fu;
+  const div=document.createElement('div');
+  div.className=`card ${dn?'done-c':ia?'active-c':''}`;
+  div.id=`card-${ch.id}`;
+
+  const cb=ch.cipher==='substitution'?'b-sub':ch.cipher==='vigenere'?'b-vig':'b-caesar';
+  const df=ch.diff==='easy'?'b-easy':ch.diff==='medium'?'b-medium':'b-hard';
+
+  let body='';
+  if(!un){
+    body=`<div class="locked">🔒 &nbsp; Complete the previous challenge to unlock this one.</div>`;
+  } else if(dn){
+    body=`<div class="fb fbok">✦ Solved — beautifully done!</div>`;
+  } else {
+    /* ===== ENCRYPT: CAESAR ===== */
+    if(mode==='encrypt'&&ch.cipher==='caesar'){
+      body=`
+        <div class="lbl">Plaintext to encrypt</div>
+        <div class="cbox em">${ch.pt}</div>
+        <div class="lbl">Apply shift <span style="font-family:var(--mono);font-size:17px;color:var(--ink);font-weight:600;">${ch.shift}</span> — use the alphabet below to count forward ${ch.shift} letters from each plaintext letter</div>
+        <div style="overflow-x:auto;margin-bottom:1.5rem;padding-bottom:4px;">
+          <table style="border-collapse:collapse;font-family:var(--mono);font-size:14px;white-space:nowrap;">
+            <tr>
+              <td style="padding:4px 8px;font-family:var(--display);font-size:10px;color:var(--gold);letter-spacing:1px;">A-Z</td>
+              <td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">A</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">B</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">C</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">D</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">E</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">F</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">G</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">H</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">I</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">J</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">K</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">L</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">M</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">N</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">O</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">P</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">Q</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">R</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">S</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">T</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">U</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">V</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">W</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">X</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">Y</td><td style="padding:6px 8px;border:1px solid rgba(128,0,32,.15);text-align:center;color:var(--ink);font-weight:600;">Z</td>
+            </tr>
+          </table>
+        </div>`;
+    }
+    /* ===== DECRYPT: CAESAR ===== */
+    else if(mode==='decrypt'&&ch.cipher==='caesar'){
+      body=`
+        <div class="lbl">Ciphertext</div>
+        <div class="cbox">${ch.ct}</div>
+        <div class="lbl">Try different shifts</div>
+        <div class="slrow">
+          <label>Shift</label>
+          <input type="range" min="1" max="25" value="1" step="1" id="sl-${ch.id}"
+            oninput="dcPrev(${ch.id});document.getElementById('sv-${ch.id}').textContent=this.value"/>
+          <span class="sval" id="sv-${ch.id}">1</span>
+        </div>
+        <div class="lbl">Live decryption preview</div>
+        <div class="prev" id="prev-${ch.id}">${ch.ct}</div>`;
+    }
+    /* ===== ENCRYPT: SUBSTITUTION ===== */
+    else if(mode==='encrypt'&&ch.cipher==='substitution'){
+      body=`
+        <div class="lbl">Plaintext to encrypt</div>
+        <div class="cbox em">${ch.pt}</div>
+        <div class="lbl">Key — reversed alphabet (A→Z, B→Y, C→X…)</div>
+        <div style="overflow-x:auto;margin-bottom:1.25rem;">
+          <table style="border-collapse:collapse;font-family:var(--mono);font-size:12px;white-space:nowrap;">
+            <tr><td style="padding:3px 5px;color:var(--gold);font-size:10px;font-family:var(--display);">PLAIN</td>${'ABCDEFGHIJKLM'.split('').map(c=>`<td style="padding:3px 6px;border:1px solid rgba(128,0,32,.15);color:var(--ink2);">${c}</td>`).join('')}</tr>
+            <tr><td style="padding:3px 5px;color:var(--rust);font-size:10px;font-family:var(--display);">CIPHER</td>${'ZYXWVUTSRQPON'.split('').map(c=>`<td style="padding:3px 6px;border:1px solid rgba(128,0,32,.15);color:var(--ink);font-weight:600;">${c}</td>`).join('')}</tr>
+            <tr><td></td>${Array(13).fill(`<td style="padding:1px;"></td>`).join('')}</tr>
+            <tr><td style="padding:3px 5px;color:var(--gold);font-size:10px;font-family:var(--display);">PLAIN</td>${'NOPQRSTUVWXYZ'.split('').map(c=>`<td style="padding:3px 6px;border:1px solid rgba(128,0,32,.15);color:var(--ink2);">${c}</td>`).join('')}</tr>
+            <tr><td style="padding:3px 5px;color:var(--rust);font-size:10px;font-family:var(--display);">CIPHER</td>${'MLKJIHGFEDCBA'.split('').map(c=>`<td style="padding:3px 6px;border:1px solid rgba(128,0,32,.15);color:var(--ink);font-weight:600;">${c}</td>`).join('')}</tr>
+          </table>
+        </div>
+`;
+    }
+    /* ===== DECRYPT: SUBSTITUTION ===== */
+    else if(mode==='decrypt'&&ch.cipher==='substitution'){
+      solverMaps[ch.id]={};
+      const used=[...new Set(ch.ct.replace(/[^A-Z]/gi,'').toUpperCase().split(''))].sort();
+      body=`
+        <div class="lbl">Ciphertext</div>
+        <div class="cbox">${ch.ct}</div>
+        <div class="lbl">Map each cipher letter → what you think it decodes to</div>
+        <div class="sgrid">${used.map(c=>`<div class="sc"><div class="sco">${c}</div>
+          <input maxlength="1" id="sc-${ch.id}-${c}" oninput="solverMaps[${ch.id}]['${c}']=this.value.toUpperCase();sPrev(${ch.id});" placeholder="?"/></div>`).join('')}</div>
+        <div class="lbl">Live preview</div>
+        <div class="prev" id="prev-${ch.id}">${ch.ct}</div>`;
+    }
+    /* ===== ENCRYPT: VIGENÈRE ===== */
+    else if(mode==='encrypt'&&ch.cipher==='vigenere'){
+      const clean=ch.pt.replace(/ /g,'');
+      body=`
+        <div class="lbl">Word to encrypt</div>
+        <div class="cbox em">${ch.pt}</div>
+        <div class="lbl">Keyword</div>
+        <div class="kpill">${ch.vkey}</div>
+        <div class="lbl">How to encrypt — step by step</div>
+        <div style="background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.15);border-radius:10px;padding:14px 16px;margin-bottom:1.25rem;font-size:15px;line-height:2;">
+          <p style="margin-bottom:10px;color:var(--ink2);">The keyword <strong style="color:var(--ink);font-family:var(--mono);">${ch.vkey}</strong> repeats over your word. Each keyword letter tells you how many steps forward to shift the plaintext letter:</p>
+          <div style="font-family:var(--mono);font-size:13px;">
+            <div style="margin-bottom:4px;"><span style="color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;">A = 0 steps &nbsp;</span> — used for letters 1, 4 (no shift — letter stays the same)</div>
+            <div style="margin-bottom:4px;"><span style="color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;">C = 2 steps &nbsp;</span> — used for letters 2, 5</div>
+            <div style="margin-bottom:12px;"><span style="color:var(--gold);font-family:var(--display);font-size:10px;letter-spacing:1px;">E = 4 steps &nbsp;</span> — used for letters 3, 6</div>
+          </div>
+          <div class="vtable">
+            <table>
+              <tr><td class="vt-h">Letter</td>${clean.split('').map((_,i)=>`<td class="vt-h">${i+1}</td>`).join('')}</tr>
+              <tr><td class="vt-h">Plain</td>${clean.split('').map(c=>`<td class="vt-c">${c}</td>`).join('')}</tr>
+              <tr><td class="vt-h">Key</td>${clean.split('').map((_,i)=>`<td class="vt-k">${ch.vkey[i%ch.vkey.length]}</td>`).join('')}</tr>
+              <tr><td class="vt-h">Steps</td>${clean.split('').map((_,i)=>`<td class="vt-s">+${AL.indexOf(ch.vkey[i%ch.vkey.length].toUpperCase())}</td>`).join('')}</tr>
+            </table>
+          </div>
+          <p style="margin-top:12px;color:var(--ink2);font-size:14px;">Count <strong style="color:var(--ink);">forward</strong> that many letters in the alphabet for each one. Wrap around from Z back to A if needed.</p>
+        </div>`;
+    }
+    /* ===== DECRYPT: VIGENÈRE ===== */
+    else if(mode==='decrypt'&&ch.cipher==='vigenere'){
+      const clean=ch.ct.replace(/ /g,'');
+      body=`
+        <div class="lbl">Secret message to decode</div>
+        <div class="cbox">${ch.ct}</div>
+        <div class="lbl">Keyword</div>
+        <div class="kpill">${ch.vkey}</div>
+        <div style="background:rgba(128,0,32,.04);border:1px solid rgba(128,0,32,.15);border-radius:10px;padding:14px 16px;margin-bottom:1.25rem;font-size:15px;line-height:1.9;">
+          <p style="color:var(--ink);font-weight:600;margin-bottom:8px;">How to decode — 3 simple steps:</p>
+          <p style="color:var(--ink2);margin-bottom:6px;">① The keyword <span style="font-family:var(--mono);color:var(--ink);font-weight:600;">${ch.vkey}</span> repeats over the secret message, one letter at a time.</p>
+          <p style="color:var(--ink2);margin-bottom:6px;">② Each keyword letter tells you how many steps <strong style="color:var(--ink);">backward</strong> to shift the coded letter in the alphabet.</p>
+          <p style="color:var(--ink2);margin-bottom:14px;">③ <span style="font-family:var(--mono);color:var(--gold2);">A = 0 steps</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">C = 2 steps back</span> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--gold2);">E = 4 steps back</span></p>
+          <div class="vtable">
+            <table>
+              <tr><td class="vt-h">Letter #</td>${clean.split('').map((_,i)=>`<td class="vt-h">${i+1}</td>`).join('')}</tr>
+              <tr><td class="vt-h">Coded</td>${clean.split('').map(c=>`<td class="vt-c">${c}</td>`).join('')}</tr>
+              <tr><td class="vt-h">Key letter</td>${clean.split('').map((_,i)=>`<td class="vt-k">${ch.vkey[i%ch.vkey.length]}</td>`).join('')}</tr>
+              <tr><td class="vt-h">Steps back</td>${clean.split('').map((_,i)=>`<td class="vt-s">−${AL.indexOf(ch.vkey[i%ch.vkey.length].toUpperCase())}</td>`).join('')}</tr>
+            </table>
+          </div>
+          <p style="color:var(--ink2);font-size:14px;margin-top:10px;">Example: the first letter is <strong style="color:var(--ink);font-family:var(--mono);">C</strong>, and its key letter is <strong style="color:var(--rust);font-family:var(--mono);">A</strong> (0 steps back) — so it stays <strong style="color:var(--ink);font-family:var(--mono);">C</strong>.</p>
+        </div>`;
+    }
+
+    body+=`
+      <div class="arow">
+        <input type="text" id="ans-${ch.id}"
+          placeholder="${mode==='encrypt'?'Type your encrypted result…':'Type the decrypted message…'}"
+          onkeydown="if(event.key==='Enter')chk(${ch.id})"
+          oninput="livePrev(${ch.id})"/>
+        <button class="bsub" onclick="chk(${ch.id})">Submit</button>
+        <button class="bhint" onclick="togH(${ch.id})">Hint</button>
+      </div>
+      <div class="fb" id="fb-${ch.id}"></div>
+      <div class="hbox" id="hb-${ch.id}">${ch.hint}</div>`;
+  }
+
+  div.innerHTML=`
+    <div class="ch-head">
+      <span class="badge b-num">0${ch.id+1}</span>
+      <span class="badge ${cb}">${ch.cipher==='caesar'?'Caesar':ch.cipher==='substitution'?'Substitution':'Vigenère'}</span>
+      <span class="badge ${df}">${ch.diff}</span>
+      ${dn?'<span class="badge b-done" style="margin-left:auto;">✦ Solved</span>':''}
+    </div>
+    <h3>${ch.title}</h3>
+    <p class="desc">${ch.desc}</p>
+    ${body}`;
+  return div;
+}
+
+function encCaesarPrev(id){
+  const ch=CHALLENGES[mode][id];
+  const s=parseInt(document.getElementById(`sl-${id}`).value);
+  const p=document.getElementById(`prev-${id}`);
+  const r=cEnc(ch.pt,s);
+  p.textContent=r;
+  p.style.color=r===ch.ans?'var(--sage)':'var(--rust)';
+}
+function dcPrev(id){
+  const ch=CHALLENGES[mode][id];
+  const s=parseInt(document.getElementById(`sl-${id}`).value);
+  const p=document.getElementById(`prev-${id}`),r=cDec(ch.ct,s);
+  p.textContent=r;p.style.color=r===ch.ans?'var(--sage)':'rgba(128,0,32,.35)';
+}
+function sPrev(id){
+  const ch=CHALLENGES[mode][id];
+  const r=ch.ct.toUpperCase().split('').map(c=>AL.includes(c)?(solverMaps[id][c]||'_'):c).join('');
+  const p=document.getElementById(`prev-${id}`);
+  p.textContent=r;p.style.color=r===ch.ans?'var(--sage)':'rgba(128,0,32,.35)';
+}
+function livePrev(id){
+  const ch=CHALLENGES[mode][id];
+  const val=document.getElementById(`ans-${id}`).value.toUpperCase();
+  const p=document.getElementById(`prev-${id}`);
+  if(!p)return;
+  p.textContent=val||'—';p.style.color=val===ch.ans?'var(--sage)':'var(--rust)';
+}
+function chk(id){
+  const ch=CHALLENGES[mode][id];
+  const val=document.getElementById(`ans-${id}`).value.toUpperCase().trim();
+  const fb=document.getElementById(`fb-${id}`);
+  if(val===ch.ans){solved.add(id);renderChallenges();}
+  else{fb.className='fb fberr';fb.textContent='✗ Not quite — check your work and try again!';}
+}
+function togH(id){const e=document.getElementById(`hb-${id}`);e.style.display=e.style.display==='block'?'none':'block';}
+function showName(){const n=document.getElementById('nin').value.trim(),d=document.getElementById('nout');if(n){d.textContent='✦ '+n.toUpperCase()+' ✦';d.style.display='block';}}
+function reset(){
+  mode=null;solved=new Set();solverMaps={};
+  document.getElementById('mode-screen').style.display='block';
+  document.getElementById('challenge-area').style.display='none';
+  document.getElementById('challenge-area').innerHTML='';
+  document.getElementById('win').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function particles(){
+  const cols=['#800020','#c8860a','#f5c842','#a0340a','#d4556a','#4a6741'];
+  const shapes=['50%','4px','50%','8px'];
+  for(let i=0;i<70;i++)setTimeout(()=>{
+    const p=document.createElement('div');p.className='pt';
+    const sz=6+Math.random()*10;
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}vw;top:-14px;animation-duration:${2.5+Math.random()*2.5}s;animation-delay:${Math.random()*2}s;border-radius:${shapes[Math.floor(Math.random()*shapes.length)]};`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),7000);
+  },i*28);
+}
+</script>
+</body>
+</html>
